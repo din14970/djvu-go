@@ -63,7 +63,7 @@ func newCodec(img *Image) *codec {
 
 // isNullSlice checks whether the current band and quantization can
 // produce data, and prepares the coefficient states for band zero.
-func (c *codec) isNullSlice(bit, band int) bool {
+func (c *codec) isNullSlice(_, band int) bool {
 	if band == 0 {
 		isNull := true
 		for i := 0; i < 16; i++ {
@@ -77,7 +77,7 @@ func (c *codec) isNullSlice(bit, band int) bool {
 		return isNull
 	}
 	threshold := c.quantHi[band]
-	return !(threshold > 0 && threshold < 0x8000)
+	return threshold <= 0 || threshold >= 0x8000
 }
 
 // codeSlice decodes one slice (one bit of one band over all blocks).
@@ -165,7 +165,7 @@ func (c *codec) decodePrepare(fbucket, nbucket int, blk *block) int {
 }
 
 // decodeBuckets decodes the buckets of one block in the current slice.
-func (c *codec) decodeBuckets(zp *bzz.ZPDecoder, bit, band int, blk *block, fbucket, nbucket int) {
+func (c *codec) decodeBuckets(zp *bzz.ZPDecoder, _, band int, blk *block, fbucket, nbucket int) {
 	bbstate := c.decodePrepare(fbucket, nbucket, blk)
 	// Code root bit.
 	if nbucket < 16 || bbstate&coefActive != 0 {

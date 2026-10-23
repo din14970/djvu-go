@@ -11,6 +11,7 @@ implementation (libdjvu 3.5.x); deviations are noted below.
 ```
 djvu.go        Document, Open, Kind, PageCount, Pages, Components,
                Annotations, Metadata
+render.go      Render, RenderPNG, RenderOptions (per document layer cache)
 info.go        INFO chunk (page geometry and display parameters)
 anno.go        annotation expression parser, Annotations, Metadata
 text.go        hidden text (TXTa/TXTz)
@@ -18,14 +19,15 @@ outline.go     outline / bookmarks (NAVM)
 iff/           low-level IFF85 chunk parser (public)
 internal/bzz/   BZZ decompression (ZP coder + inverse Burrows-Wheeler)
 internal/dirm/ DIRM directory parser (multipage documents)
-```
-
-Planned packages for image decoding (see roadmap):
-
-```
-internal/jb2/  JB2 bilevel image decoder (Sjbz/Djbz chunks)
-internal/iw44/ IW44 wavelet image decoder (BG44/FG44/TH44 chunks)
-internal/num/  number codec shared by JB2 and IW44 (built on the ZP coder)
+internal/jb2/  JB2 bilevel decoder (Sjbz/Djbz chunks, shape dictionaries)
+internal/iw44/ IW44 wavelet decoder (BG44/FG44 chunks: slice codec,
+               inverse lifting, full and subsampled reconstruction)
+internal/palette/  FGbz palette (DjVuPalette)
+internal/pixmap/   compositing primitives: bottom-up RGB pixmap, alpha
+               count map, attenuate/blit/stencil, bilinear scaler
+internal/render/   MRC page compositor (background + stencil)
+internal/bitmap/   packed 1bpp page masks (mode black)
+internal/zptest/   ZP test encoder (round trip tests)
 ```
 
 ## The chunk model
@@ -158,35 +160,74 @@ The same ZP coder, with different context trees and number codecs, is
 the foundation of JB2 and IW44; internal/bzz/zp.go is written so it can
 be reused for those decoders.
 
-## Roadmap: image decoding
+## The render pipeline
 
-1. `internal/num`: the number codec from the JB2 specification
-   (arithmetic coded numbers with adaptive contexts, built on the ZP
-   coder from internal/bzz).
-2. `internal/jb2`: JB2 bilevel decoding for Sjbz chunks (records:
-   start-of-image, symbol library, matched copies and refinements,
-   blit list; REQUIRED_DICT_OR_RESET records from format version 21
-   for shared Djbz dictionaries). Output: 1-bit page masks.
-3. `internal/iw44`: IW44 wavelet decoding for BG44/FG44 chunks
-   (chunk headers with serial/chunk numbers, zigzag coefficient
-   coding, successive refinement passes). Output: gray/color images.
-4. With Sjbz + BG44/FG44 decoded, compound pages can be rendered by
-   painting the foreground color image through the JB2 mask over the
-   background. Smmr (MMR) and BGjp/FGjp (JPEG) alternative encodings
-   can follow; JPEG would need either a stdlib-based decoder (Go 1.22
-   has image/jpeg) or an external dependency.
-5. FGbz palettes (DjVuPalette, itself BZZ compressed) for per-object
-   foreground colors.
+Page rendering composites the layers of the MRC model, following
+DjVuImage::get_pixmap and DjVuImage::stencil of the reference:
 
-Until then this library reads everything except pixels.
+    ZP arithmetic coder
+        |
+        +-- JB2 (Sjbz)  --> blit list --> alpha count map (GBitmap semantics)
+        +-- IW44 (BG44)  --> coefficients --> inverse lifting --> background
+        +-- IW44 (FG44)  --> coefficients --> inverse lifting --> color foreground
+        +-- FGbz         --> palette + per-blit color indices
+        |
+    MRC composite (internal/render)
+        background warped to page resolution (direct reductions or the
+        bilinear scaler), attenuated through the alpha map, then either
+        per-color-group blending (two-layer, FGbz) or supersampled
+        stencil blending (three-layer, FG44).
+        |
+    top-down RGBA (image package convention)
+
+Key properties, all verified byte-exact against ddjvu:
+
+- The ZP coder, the JB2 record coder and the IW44 slice coder are
+  line-by-line ports of the reference; the IW44 decode produces the
+  same coefficient decisions as djvulibre for every fixture (verified
+  by tracing the full decision sequence, 400k+ records, against an
+  instrumented reference build).
+- The IW44 block storage is two-level sparse: each of the four pdata
+  groups holds sixteen independent bucket pointers. Allocating one
+  bucket must not make its neighbors appear, or the codec state machine
+  reads stale state and desynchronizes.
+- The horizontal lifting filter keeps the rolled a3 tap when the tap
+  position falls outside the row (widths below 7*s3).
+- The alpha map counts bilevel source pixels into subsample-sized
+  boxes, wrapping at 255 like the C++ unsigned char.
+- Palette entries are stored blue/green/red, the memory layout of
+  GPixel.
+
+## Roadmap
+
+Done: JB2 masks (with shared Djbz dictionaries), IW44 backgrounds and
+foregrounds, FGbz palettes, MRC compositing, subsampled rendering.
+
+Remaining:
+
+1. Page rotation from the INFO orientation flags at render time, and
+   non-identity gamma correction (both need API decisions: ddjvu
+   applies the correction during compositing).
+2. Smmr (MMR) and BGjp/FGjp (JPEG) image alternatives. JPEG can use the
+   standard library's image/jpeg.
+3. Loading the external files of indirect documents.
+4. Encoding: a write side would need BZZ/JB2/IW44 encoders; the JB2
+   test encoder in internal/zptest is a starting point.
 
 ## Test strategy
 
 - Unit tests for each package, including byte-level edge cases taken
   from the specification and the reference sources.
-- Golden fixtures in testdata/ generated with the djvulibre tools
-  (cjb2, djvm, djvmcvt, djvused, bzz); testdata/djvu/generate.sh
-  regenerates them. Synthetic DIRM and BZZ payloads are built from
-  pre-compressed blobs so tests do not need a BZZ encoder.
-- Fuzz targets for the chunk parser (iff) and the BZZ decoder.
-- Benchmarks for the chunk walker and the BZZ decoder.
+- Golden fixtures generated with the djvulibre tools (c44, cjb2,
+  cpaldjvu, ddjvu); the generate.sh scripts in the testdata
+  directories regenerate them. Renderings (masks, gray and color
+  backgrounds, compound palette pages, three-layer pages, bilevel
+  pages, subsampled composites) are compared byte for byte against
+  ddjvu output.
+- Fuzz targets for the chunk parser, the BZZ decoder, JB2 images and
+  dictionaries, IW44 chunks, FGbz palettes, and the whole pipeline.
+- A corpus test renders every page of the real-world documents in
+  realdata/ (skipped when the directory is absent; the files are never
+  committed).
+- Benchmarks for the chunk walker, the BZZ decoder, the alpha blits
+  and full page renders.

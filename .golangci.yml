@@ -1,0 +1,26 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - revive
+    - gosec
+  settings:
+    gosec:
+      excludes:
+        # The decoders replicate the integer semantics of the C++
+        # reference implementation, where narrowing conversions wrap
+        # by design (unsigned short arithmetic, byte sized counters).
+        - G115
+  exclusions:
+    rules:
+      # Tests read fixture files through variables and use math/rand
+      # for synthetic data; neither is a security concern.
+      - path: _test\.go
+        linters:
+          - gosec
+      - path: ^examples/
+        linters:
+          - gosec

@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        go: ['1.22', '1.23']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Build
+        run: go build ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test ./... -count=1
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.4
+          args: --timeout=5m
+
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Fuzz each target for 60 seconds
+        run: |
+          set -e
+          go test ./iff -run FuzzParseChunks -fuzz FuzzParseChunks -fuzztime 60s
+          go test ./internal/bzz -run FuzzBZZ -fuzz FuzzBZZ -fuzztime 60s
+          go test ./internal/jb2 -run FuzzDecodeImage -fuzz FuzzDecodeImage -fuzztime 60s
+          go test ./internal/jb2 -run FuzzDecodeDict -fuzz FuzzDecodeDict -fuzztime 60s
+          go test ./internal/iw44 -run FuzzDecodeChunk -fuzz FuzzDecodeChunk -fuzztime 60s
+          go test ./internal/palette -run FuzzDecode -fuzz FuzzDecode -fuzztime 60s
+          go test . -run FuzzOpenRender -fuzz FuzzOpenRender -fuzztime 60s

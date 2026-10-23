@@ -118,7 +118,7 @@ func FuzzBZZ(f *testing.F) {
 	}
 	f.Add([]byte{0xff, 0xff, 0xff, 0xff})
 	f.Add([]byte("garbage"))
-	f.Fuzz(func(t *testing.T, data []byte) {
+	f.Fuzz(func(_ *testing.T, data []byte) {
 		if len(data) > 512<<10 {
 			return
 		}

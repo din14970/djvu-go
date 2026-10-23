@@ -171,8 +171,7 @@ func filterBH(p []int16, base, w, h, rowsize, scale int) {
 		}
 		for q-s3 < e {
 			// Special case: w <= x < w+3.
-			b0, b1 = b1, b2
-			b2 = b3
+			b1, b2 = b2, b3
 			if q-s3 >= row {
 				p[q-s3] += int16((b1 + b2 + 1) >> 1)
 			}

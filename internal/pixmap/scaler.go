@@ -1,10 +1,5 @@
 package pixmap
 
-import (
-	"fmt"
-	"os"
-)
-
 // fracBits is the fixed point precision of the scaler coordinates.
 const (
 	fracBits  = 4
@@ -29,15 +24,16 @@ type Rect struct {
 	XMin, YMin, XMax, YMax int
 }
 
-func (r Rect) Width() int  { return r.XMax - r.XMin }
+// Width returns the width of the rectangle.
+func (r Rect) Width() int { return r.XMax - r.XMin }
+
+// Height returns the height of the rectangle.
 func (r Rect) Height() int { return r.YMax - r.YMin }
 
 // Scaler resizes pixmaps with the bilinear interpolation of the
 // reference implementation (GPixmapScaler): coordinates are computed
 // with a Bresenham algorithm at 1/16 pixel precision, and large
 // reductions first average 2^shift blocks.
-var debugScale = os.Getenv("SCALEDBG") != ""
-
 type Scaler struct {
 	inw, inh, outw, outh int
 	xshift, yshift       int
@@ -154,10 +150,6 @@ func (s *Scaler) Scale(provided Rect, in *Pixmap, desired Rect, out *Pixmap) {
 		*out = *New(desired.Width(), desired.Height())
 	}
 	bufw := red.Width()
-	if debugScale {
-		fmt.Printf("DBG red=%v inp=%v bufw=%d xshift=%d yshift=%d\n", red, inp, bufw, s.xshift, s.yshift)
-		fmt.Printf("DBG hcoord[:6]=%v vcoord[:6]=%v\n", s.hcoord[:6], s.vcoord[:6])
-	}
 	lbuf := make([]byte, 3*(bufw+2))
 	if s.xshift > 0 || s.yshift > 0 {
 		s.gp1, s.gp2 = make([]byte, 3*bufw), make([]byte, 3*bufw)
@@ -180,9 +172,6 @@ func (s *Scaler) Scale(provided Rect, in *Pixmap, desired Rect, out *Pixmap) {
 			upper = in.Pix[(fy2-provided.YMin)*3*in.W+dx*3 : (fy2-provided.YMin+1)*3*in.W]
 		}
 		deltas := interp[fy&fracMask]
-		if debugScale && y == desired.YMin {
-			fmt.Printf("DBG y=%d fy=%d fy1=%d fy2=%d lbuf[:9]=%v\n", y, fy, fy1, fy2, lbuf[:9])
-		}
 		for x := 0; x < bufw; x++ {
 			for k := 0; k < 3; k++ {
 				lv := int(lower[3*x+k])
@@ -196,9 +185,6 @@ func (s *Scaler) Scale(provided Rect, in *Pixmap, desired Rect, out *Pixmap) {
 		lbuf[3*(bufw+1)], lbuf[3*(bufw+1)+1], lbuf[3*(bufw+1)+2] =
 			lbuf[3*bufw], lbuf[3*bufw+1], lbuf[3*bufw+2]
 		lineOff := 3 * (1 - red.XMin)
-		if debugScale && y == desired.YMin {
-			fmt.Printf("DBG horiz: lbuf[:12]=%v lineOff=%d n0=%d\n", lbuf[:12], lineOff, s.hcoord[desired.XMin])
-		}
 		for x := desired.XMin; x < desired.XMax; x++ {
 			n := s.hcoord[x]
 			lowerX := lineOff + 3*(n>>fracBits)

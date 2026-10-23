@@ -94,8 +94,6 @@ func (z *ZPDecoder) preload() {
 	}
 }
 
-// decode decodes one message bit using (and adapting) the context
-// variable pointed to by ctx.
 // Decode decodes one message bit using (and adapting) the context
 // variable pointed to by ctx. It returns 0 or 1.
 func (z *ZPDecoder) Decode(ctx *uint8) int {

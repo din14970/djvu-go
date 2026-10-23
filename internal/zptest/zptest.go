@@ -46,7 +46,9 @@ func (e *Encoder) outbit(bit int) {
 		e.cur = e.cur<<1 | byte(bit)
 		e.scount++
 		if e.scount == 8 {
-			e.w.Write([]byte{e.cur})
+			if _, err := e.w.Write([]byte{e.cur}); err != nil {
+				panic(err) // writing to a bytes.Buffer never fails
+			}
 			e.scount = 0
 			e.cur = 0
 		}

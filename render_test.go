@@ -45,9 +45,9 @@ func readPNM(t *testing.T, path string) (w, h int, pix []byte) {
 			t.Fatalf("%s: bad PNM header: %v", path, err)
 		}
 	}
-	w, h, max := fields[0], fields[1], fields[2]
-	if max != 255 {
-		t.Fatalf("%s: unsupported max value %d", path, max)
+	w, h, maxval := fields[0], fields[1], fields[2]
+	if maxval != 255 {
+		t.Fatalf("%s: unsupported max value %d", path, maxval)
 	}
 	pos++
 	raw := data[pos:]
@@ -284,4 +284,31 @@ func TestRenderCorpus(t *testing.T) {
 			}
 		}
 	}
+}
+
+// BenchmarkRender measures a full page render at native resolution and
+// at a typical browsing subsampling.
+func BenchmarkRender(b *testing.B) {
+	data, err := os.ReadFile("internal/render/testdata/compound.djvu")
+	if err != nil {
+		b.Fatal(err)
+	}
+	d, err := Open(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.Run("sub1", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if _, err := d.Render(0, RenderOptions{}); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
+	b.Run("sub4", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			if _, err := d.Render(0, RenderOptions{Subsample: 4}); err != nil {
+				b.Fatal(err)
+			}
+		}
+	})
 }

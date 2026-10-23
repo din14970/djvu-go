@@ -372,7 +372,9 @@ func (c *codec) codeInheritedShapeCount(d *Dict, dict *Dict) error {
 	if size > 0 && dict == nil && c.dictCallback != nil {
 		dict = c.dictCallback()
 		if dict != nil {
-			d.setInherited(dict)
+			if err := d.setInherited(dict); err != nil {
+				return err
+			}
 		}
 	}
 	if size > 0 && dict == nil {
@@ -470,7 +472,6 @@ func (c *codec) codeRelativeLocation(b *Blit, rows, columns int) error {
 		left = c.lastRight + xd
 		bottom = c.lastBottom + yd
 		right = left + columns - 1
-		top = bottom + rows - 1
 		c.lastLeft = left
 		c.lastRight = right
 		c.lastBottom = c.updateShortList(bottom)
@@ -481,7 +482,7 @@ func (c *codec) codeRelativeLocation(b *Blit, rows, columns int) error {
 }
 
 // codeAbsoluteLocation decodes an absolute blit position (NON_MARK_DATA).
-func (c *codec) codeAbsoluteLocation(b *Blit, rows, columns int) error {
+func (c *codec) codeAbsoluteLocation(b *Blit, rows, _ int) error {
 	if !c.gotStart {
 		return fmt.Errorf("jb2: location record before start of data")
 	}
@@ -499,7 +500,7 @@ func (c *codec) codeAbsoluteLocation(b *Blit, rows, columns int) error {
 }
 
 // codeAbsoluteMarkSize decodes the size of a directly coded shape.
-func (c *codec) codeAbsoluteMarkSize(border int) (w, h int, err error) {
+func (c *codec) codeAbsoluteMarkSize(_ int) (w, h int, err error) {
 	w, err = c.codeNum(0, bigPositive, &c.absSizeX)
 	if err != nil {
 		return 0, 0, err
@@ -515,7 +516,7 @@ func (c *codec) codeAbsoluteMarkSize(border int) (w, h int, err error) {
 }
 
 // codeRelativeMarkSize decodes the size of a cross coded shape.
-func (c *codec) codeRelativeMarkSize(cw, ch, border int) (w, h int, err error) {
+func (c *codec) codeRelativeMarkSize(cw, ch, _ int) (w, h int, err error) {
 	xd, err := c.codeNum(bigNegative, bigPositive, &c.relSizeX)
 	if err != nil {
 		return 0, 0, err

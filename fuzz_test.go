@@ -24,7 +24,7 @@ func FuzzOpenRender(f *testing.F) {
 	f.Add([]byte{})
 	f.Add([]byte("AT&T"))
 	f.Add([]byte("FORM\x00\x00\x00\x0cDJVUDIRM\x00\x00\x00\x00"))
-	f.Fuzz(func(t *testing.T, data []byte) {
+	f.Fuzz(func(_ *testing.T, data []byte) {
 		if len(data) > 1<<20 {
 			return
 		}

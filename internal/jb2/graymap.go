@@ -67,18 +67,18 @@ func (g *grayMap) rowWrite(y int) []byte {
 
 // ensureBorder grows the horizontal border of the bitmap, preserving
 // content and zero-filling the new padding (GBitmap::minborder).
-func (g *grayMap) ensureBorder(min int) {
-	if g.border >= min {
+func (g *grayMap) ensureBorder(minborder int) {
+	if g.border >= minborder {
 		return
 	}
 	old := *g
-	ng := newGrayMap(g.w, g.h, min)
+	ng := newGrayMap(g.w, g.h, minborder)
 	for y := 0; y < g.h; y++ {
 		if old.rows[y] == nil {
 			continue
 		}
 		nr := ng.rowWrite(y)
-		copy(nr[min:], old.rows[y][old.border:old.border+old.w])
+		copy(nr[minborder:], old.rows[y][old.border:old.border+old.w])
 	}
 	*g = *ng
 }

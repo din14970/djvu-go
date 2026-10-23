@@ -156,9 +156,13 @@ func TestParseSyntheticV0(t *testing.T) {
 	var buf bytes.Buffer
 	buf.Write([]byte{0x80, 0x00, 0x02}) // bundled, version 0, 2 files
 	// Offsets and sizes are interleaved per file in version 0.
-	binary.Write(&buf, binary.BigEndian, uint32(100))
+	if err := binary.Write(&buf, binary.BigEndian, uint32(100)); err != nil {
+		t.Fatal(err)
+	}
 	buf.Write([]byte{0x00, 0x03, 0xE8}) // size of file 0: 1000
-	binary.Write(&buf, binary.BigEndian, uint32(200))
+	if err := binary.Write(&buf, binary.BigEndian, uint32(200)); err != nil {
+		t.Fatal(err)
+	}
 	buf.Write([]byte{0x00, 0x07, 0xD0}) // size of file 1: 2000
 	buf.Write(syntheticTail(t, "tail_v0.bz"))
 	dir, err := Parse(bytes.NewReader(buf.Bytes()))

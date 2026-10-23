@@ -70,9 +70,9 @@ func readPNM(t *testing.T, path string) (w, h int, pix []byte) {
 			t.Fatalf("%s: bad PNM header: %v", path, err)
 		}
 	}
-	w, h, max := fields[0], fields[1], fields[2]
-	if max != 255 {
-		t.Fatalf("%s: unsupported max value %d", path, max)
+	w, h, maxval := fields[0], fields[1], fields[2]
+	if maxval != 255 {
+		t.Fatalf("%s: unsupported max value %d", path, maxval)
 	}
 	pos++ // single whitespace after max
 	raw := data[pos:]

@@ -49,9 +49,9 @@ func readPNM(t *testing.T, path string) (w, h int, pix []byte) {
 			t.Fatalf("%s: bad PNM header: %v", path, err)
 		}
 	}
-	w, h, max := fields[0], fields[1], fields[2]
-	if max != 255 {
-		t.Fatalf("%s: unsupported max value %d", path, max)
+	w, h, maxval := fields[0], fields[1], fields[2]
+	if maxval != 255 {
+		t.Fatalf("%s: unsupported max value %d", path, maxval)
 	}
 	pos++
 	raw := data[pos:]
@@ -203,7 +203,7 @@ func TestGoldenCompoundSubsample(t *testing.T) {
 
 // comparePNM checks the composite against a golden PNM and reports
 // the number of differing bytes.
-func comparePNM(t *testing.T, pm interface {
+func comparePNM(_ *testing.T, pm interface {
 	At(x, y int) (byte, byte, byte)
 }, w, h int, gold []byte) (diffs int, first string) {
 	for y := 0; y < h; y++ {

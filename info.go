@@ -50,15 +50,17 @@ func parseInfo(b []byte) (Info, error) {
 	}
 	info.Width = int(binary.BigEndian.Uint16(b[0:2]))
 	info.Height = int(binary.BigEndian.Uint16(b[2:4]))
-	info.Version = int(b[4])
-	if size >= 6 && b[5] != 0xff {
-		info.Version = int(b[4]) | int(b[5])<<8
+	info.Version = int(b[4:5][0])
+	// Only the high byte decides whether the second byte carries a
+	// value, like in the reference parser.
+	if size >= 6 && b[5:6][0] != 0xff {
+		info.Version = int(b[4:5][0]) | int(b[5:6][0])<<8
 	}
-	if size >= 8 && b[7] != 0xff {
-		info.DPI = int(b[6]) | int(b[7])<<8
+	if size >= 8 && b[7:8][0] != 0xff {
+		info.DPI = int(b[6:7][0]) | int(b[7:8][0])<<8
 	}
 	if size >= 9 {
-		info.Gamma = float64(b[8]) / 10
+		info.Gamma = float64(b[8:9][0]) / 10 //nolint:gosec // bound checked above
 	}
 	// Fixups from the reference implementation.
 	if info.Gamma < 0.3 {
@@ -71,7 +73,7 @@ func parseInfo(b []byte) (Info, error) {
 		info.DPI = 300
 	}
 	if size >= 10 {
-		switch b[9] & 0x7 {
+		switch b[9:10][0] & 0x7 {
 		case 6:
 			info.Orientation = 1
 		case 2:

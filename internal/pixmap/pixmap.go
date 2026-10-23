@@ -187,20 +187,6 @@ func (p *Pixmap) BlitColor(a *Alpha, xpos, ypos int, col [3]byte) {
 	}
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 // Stencil blends a foreground pixmap through the alpha map,
 // supersampling the foreground by the given factor, following
 // GPixmap::stencil. The pmr rectangle restricts the operation to part

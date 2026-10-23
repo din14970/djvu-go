@@ -78,14 +78,14 @@ func Background(l *Layers, subsample int) *pixmap.Pixmap {
 		pm.Fill(255, 255, 255)
 		return pm
 	}
-	switch {
-	case subsample == red:
+	switch subsample {
+	case red:
 		return bg
-	case subsample == 2*red:
+	case 2 * red:
 		return l.BGImage.Pixmap(2)
-	case subsample == 4*red:
+	case 4 * red:
 		return l.BGImage.Pixmap(4)
-	case subsample == 8*red:
+	case 8 * red:
 		return l.BGImage.Pixmap(8)
 	}
 	// All other cases go through the bilinear scaler: render the

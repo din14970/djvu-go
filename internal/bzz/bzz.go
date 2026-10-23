@@ -208,8 +208,8 @@ func (r *Reader) decodeBlock() (int, error) {
 				freq[3] >>= 24
 			}
 			fc := fadd
-			if mtfno < freqMax {
-				fc += freq[mtfno]
+			if mtfno < len(freq) {
+				fc += freq[mtfno] //nolint:gosec // mtfno < len(freq)
 			}
 			k := mtfno
 			for ; k >= freqMax; k-- {

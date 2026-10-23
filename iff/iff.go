@@ -284,25 +284,22 @@ func parseList(ra io.ReaderAt, base, end int64, depth int) ([]*Chunk, error) {
 			contentEnd: contentOff + length,
 		}
 
-		if kind == 1 {
-			// Composite chunk: read the secondary identifier.
-			if length < 4 {
-				// The reference implementation also lets the header
-				// through here and fails when descending into the
-				// (empty) content. Children reports the error.
-			} else {
-				var sec [4]byte
-				if _, err := ra.ReadAt(sec[:], contentOff); err != nil {
-					if err == io.EOF {
-						err = io.ErrUnexpectedEOF
-					}
-					return nil, fmt.Errorf("iff: reading secondary identifier of FORM at offset %d: %w", off, err)
+		if kind == 1 && length >= 4 {
+			// Composite chunk: read the secondary identifier. When the
+			// length does not cover the identifier, the reference lets
+			// the header through and fails when descending into the
+			// (empty) content; Children reports the error here too.
+			var sec [4]byte
+			if _, err := ra.ReadAt(sec[:], contentOff); err != nil {
+				if err == io.EOF {
+					err = io.ErrUnexpectedEOF
 				}
-				if _, err := checkID(string(sec[:])); err != nil || string(sec[:]) == idFORM || string(sec[:]) == idLIST || string(sec[:]) == idPROP || string(sec[:]) == idCAT {
-					return nil, fmt.Errorf("iff: composite chunk at offset %d: invalid secondary identifier %q", off, string(sec[:]))
-				}
-				c.Secondary = string(sec[:])
+				return nil, fmt.Errorf("iff: reading secondary identifier of FORM at offset %d: %w", off, err)
 			}
+			if _, err := checkID(string(sec[:])); err != nil || string(sec[:]) == idFORM || string(sec[:]) == idLIST || string(sec[:]) == idPROP || string(sec[:]) == idCAT {
+				return nil, fmt.Errorf("iff: composite chunk at offset %d: invalid secondary identifier %q", off, string(sec[:]))
+			}
+			c.Secondary = string(sec[:])
 		}
 
 		chunks = append(chunks, c)

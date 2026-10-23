@@ -285,14 +285,14 @@ func openMultipage(top *iff.Chunk) (*Document, error) {
 			comp.children = compChildren
 		}
 		d.comps[f.ID] = comp
-		switch {
-		case f.Type == dirm.TypePage:
+		switch f.Type {
+		case dirm.TypePage:
 			p := &page{file: f, form: form, children: comp.children}
 			if err := d.loadPageInfo(p); err != nil {
 				return nil, fmt.Errorf("djvu: page %q: %w", f.ID, err)
 			}
 			d.pages = append(d.pages, p)
-		case f.Type == dirm.TypeSharedAnno:
+		case dirm.TypeSharedAnno:
 			d.shared = comp
 		}
 	}

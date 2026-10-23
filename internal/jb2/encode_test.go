@@ -192,7 +192,7 @@ func (e *encCodec) codeRelativeLocation(b *Blit, rows, columns int) {
 }
 
 // codeAbsoluteLocation encodes an absolute blit position.
-func (e *encCodec) codeAbsoluteLocation(b *Blit, rows, columns int) {
+func (e *encCodec) codeAbsoluteLocation(b *Blit, rows, _ int) {
 	top := b.Bottom + rows // bottom + rows = top + 1 in the coded domain
 	e.codeNum(1, e.imageColumns, b.Left+1, &e.absLocX)
 	e.codeNum(1, e.imageRows, top, &e.absLocY)

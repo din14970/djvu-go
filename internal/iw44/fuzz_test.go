@@ -53,7 +53,7 @@ func FuzzDecodeChunk(f *testing.F) {
 	f.Add([]byte{0x00, 0x01, 0x01, 0x02, 0x00, 0x01, 0x00, 0x01, 0x00})
 	f.Add([]byte{})
 	f.Add(bytes.Repeat([]byte{0xff}, 32))
-	f.Fuzz(func(t *testing.T, data []byte) {
+	f.Fuzz(func(_ *testing.T, data []byte) {
 		if len(data) > 1<<20 {
 			return
 		}
