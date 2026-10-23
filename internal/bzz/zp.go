@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-// zpDecoder implements the decoding side of the ZP binary quasi-arithmetic
+// ZPDecoder implements the decoding side of the ZP binary quasi-arithmetic
 // coder used by BZZ, JB2 and IW44 data. It follows ZPCodec.cpp from the
 // DjVu reference library (ZPCODER variant, djvucompat mode): a fixed
 // adaptation table (zpTable), a 16 bit code register refilled from the
@@ -16,7 +16,7 @@ import (
 // before reporting an error, exactly like the reference implementation
 // (the BZZ decoder routinely over-reads a few bytes at the end of a
 // stream).
-type zpDecoder struct {
+type ZPDecoder struct {
 	src    io.Reader
 	err    error
 	a      uint32
@@ -30,9 +30,9 @@ type zpDecoder struct {
 	up, dn [256]uint8
 }
 
-// newZPDecoder creates a decoder reading code bytes from src.
-func newZPDecoder(src io.Reader) *zpDecoder {
-	z := &zpDecoder{src: src}
+// NewZPDecoder creates a decoder reading code bytes from src.
+func NewZPDecoder(src io.Reader) *ZPDecoder {
+	z := &ZPDecoder{src: src}
 	// Machine independent find-first-zero table: number of consecutive
 	// one bits starting at the most significant bit of a byte.
 	for i := 0; i < 256; i++ {
@@ -64,7 +64,7 @@ func newZPDecoder(src io.Reader) *zpDecoder {
 // readByte reads one code byte, substituting 0xff at the end of the input.
 // The delay counter is not touched here; only preload counts end-of-input
 // encounters, following the reference implementation.
-func (z *zpDecoder) readByte() byte {
+func (z *ZPDecoder) readByte() byte {
 	var b [1]byte
 	if n, _ := z.src.Read(b[:]); n < 1 {
 		return 0xff
@@ -75,7 +75,7 @@ func (z *zpDecoder) readByte() byte {
 // preload refills the bit buffer until at least 25 bits are available.
 // It counts end-of-input encounters against the 25 byte delay budget
 // and records an error once it is exhausted.
-func (z *zpDecoder) preload() {
+func (z *ZPDecoder) preload() {
 	for z.scount <= 24 {
 		var b [1]byte
 		n, _ := z.src.Read(b[:])
@@ -96,7 +96,9 @@ func (z *zpDecoder) preload() {
 
 // decode decodes one message bit using (and adapting) the context
 // variable pointed to by ctx.
-func (z *zpDecoder) decode(ctx *uint8) int {
+// Decode decodes one message bit using (and adapting) the context
+// variable pointed to by ctx. It returns 0 or 1.
+func (z *ZPDecoder) Decode(ctx *uint8) int {
 	zz := z.a + z.p[*ctx]
 	if zz <= z.fence {
 		z.a = zz
@@ -105,14 +107,14 @@ func (z *zpDecoder) decode(ctx *uint8) int {
 	return z.decodeSub(ctx, zz)
 }
 
-// decodePass decodes one message bit without a context (pass-through).
-func (z *zpDecoder) decodePass() int {
+// DecodePass decodes one message bit without a context (pass-through).
+func (z *ZPDecoder) DecodePass() int {
 	return z.decodeSubSimple(0, 0x8000+(z.a>>1))
 }
 
 // decodeSub is ZPCodec::decode_sub: the core interval update for a coded
 // bit, including context adaptation and renormalization.
-func (z *zpDecoder) decodeSub(ctx *uint8, zz uint32) int {
+func (z *ZPDecoder) decodeSub(ctx *uint8, zz uint32) int {
 	bit := int(*ctx & 1)
 	// Avoid interval reversion.
 	if d := 0x6000 + ((zz + z.a) >> 2); zz > d {
@@ -156,7 +158,7 @@ func (z *zpDecoder) decodeSub(ctx *uint8, zz uint32) int {
 }
 
 // decodeSubSimple is ZPCodec::decode_sub_simple for context-less bits.
-func (z *zpDecoder) decodeSubSimple(mps int, zz uint32) int {
+func (z *ZPDecoder) decodeSubSimple(mps int, zz uint32) int {
 	if zz > z.code {
 		zz = 0x10000 - zz
 		z.a += zz
@@ -187,9 +189,17 @@ func (z *zpDecoder) decodeSubSimple(mps int, zz uint32) int {
 	return mps
 }
 
+// Err reports the first end-of-input error encountered by the preload
+// buffer once the 25 byte delay budget is exhausted. Decoders with no
+// natural end marker should check it periodically: after it is set,
+// decoding continues but yields deterministic garbage.
+func (z *ZPDecoder) Err() error {
+	return z.err
+}
+
 // ffz returns the number of consecutive one bits at the top of the
 // 16 bit value x (ZPCodec::ffz).
-func (z *zpDecoder) ffz(x uint32) int {
+func (z *ZPDecoder) ffz(x uint32) int {
 	if x >= 0xff00 {
 		return z.ffzt[x&0xff] + 8
 	}

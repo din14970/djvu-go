@@ -31,7 +31,7 @@ const (
 
 // Reader decompresses a BZZ stream. It implements io.Reader.
 type Reader struct {
-	zp    *zpDecoder
+	zp    *ZPDecoder
 	ctx   [numCtx]uint8
 	data  []byte // current block
 	bptr  int    // read offset within data
@@ -46,7 +46,7 @@ func NewReader(r io.Reader) *Reader {
 	// that unbuffered sources do not pay a syscall or interface call per
 	// byte. Over-reading at the end of the stream is harmless: the ZP
 	// decoder is designed to read a few bytes past the last code byte.
-	return &Reader{zp: newZPDecoder(bufio.NewReader(r))}
+	return &Reader{zp: NewZPDecoder(bufio.NewReader(r))}
 }
 
 // Read decompresses up to len(p) bytes. It returns io.EOF once the end of
@@ -115,9 +115,9 @@ func (r *Reader) decodeBlock() (int, error) {
 
 	// Decode the estimation speed flag bits.
 	fshift := 0
-	if r.zp.decodePass() != 0 {
+	if r.zp.DecodePass() != 0 {
 		fshift++
-		if r.zp.decodePass() != 0 {
+		if r.zp.DecodePass() != 0 {
 			fshift++
 		}
 	}
@@ -139,47 +139,47 @@ func (r *Reader) decodeBlock() (int, error) {
 		}
 		cx := 0
 		c := -1
-		if r.zp.decode(&r.ctx[cx+ctxid]) != 0 {
+		if r.zp.Decode(&r.ctx[cx+ctxid]) != 0 {
 			mtfno = 0
 			c = int(mtf[0])
 		} else {
 			cx += ctxIDs
-			if r.zp.decode(&r.ctx[cx+ctxid]) != 0 {
+			if r.zp.Decode(&r.ctx[cx+ctxid]) != 0 {
 				mtfno = 1
 				c = int(mtf[1])
 			} else {
 				cx += ctxIDs
-				if r.zp.decode(&r.ctx[cx]) != 0 {
+				if r.zp.Decode(&r.ctx[cx]) != 0 {
 					mtfno = 2 + decodeBinary(r.zp, r.ctx[cx+1:], 1)
 					c = int(mtf[mtfno])
 				} else {
 					cx += 2
-					if r.zp.decode(&r.ctx[cx]) != 0 {
+					if r.zp.Decode(&r.ctx[cx]) != 0 {
 						mtfno = 4 + decodeBinary(r.zp, r.ctx[cx+1:], 2)
 						c = int(mtf[mtfno])
 					} else {
 						cx += 4
-						if r.zp.decode(&r.ctx[cx]) != 0 {
+						if r.zp.Decode(&r.ctx[cx]) != 0 {
 							mtfno = 8 + decodeBinary(r.zp, r.ctx[cx+1:], 3)
 							c = int(mtf[mtfno])
 						} else {
 							cx += 8
-							if r.zp.decode(&r.ctx[cx]) != 0 {
+							if r.zp.Decode(&r.ctx[cx]) != 0 {
 								mtfno = 16 + decodeBinary(r.zp, r.ctx[cx+1:], 4)
 								c = int(mtf[mtfno])
 							} else {
 								cx += 16
-								if r.zp.decode(&r.ctx[cx]) != 0 {
+								if r.zp.Decode(&r.ctx[cx]) != 0 {
 									mtfno = 32 + decodeBinary(r.zp, r.ctx[cx+1:], 5)
 									c = int(mtf[mtfno])
 								} else {
 									cx += 32
-									if r.zp.decode(&r.ctx[cx]) != 0 {
+									if r.zp.Decode(&r.ctx[cx]) != 0 {
 										mtfno = 64 + decodeBinary(r.zp, r.ctx[cx+1:], 6)
 										c = int(mtf[mtfno])
 									} else {
 										cx += 64
-										if r.zp.decode(&r.ctx[cx]) != 0 {
+										if r.zp.Decode(&r.ctx[cx]) != 0 {
 											mtfno = 128 + decodeBinary(r.zp, r.ctx[cx+1:], 7)
 											c = int(mtf[mtfno])
 										} else {
@@ -274,22 +274,22 @@ func (r *Reader) invertBWT(size, markerpos int) error {
 
 // decodeRaw decodes an n-bit number with the pass-through (context-less)
 // decoder.
-func decodeRaw(zp *zpDecoder, bits int) int {
+func decodeRaw(zp *ZPDecoder, bits int) int {
 	n := 1
 	m := 1 << bits
 	for n < m {
-		n = n<<1 | zp.decodePass()
+		n = n<<1 | zp.DecodePass()
 	}
 	return n - m
 }
 
 // decodeBinary decodes an n-bit number using the tree of contexts rooted
 // at ctx. It mirrors decode_binary in BSByteStream.cpp.
-func decodeBinary(zp *zpDecoder, ctx []uint8, bits int) int {
+func decodeBinary(zp *ZPDecoder, ctx []uint8, bits int) int {
 	n := 1
 	m := 1 << bits
 	for n < m {
-		b := zp.decode(&ctx[n-1])
+		b := zp.Decode(&ctx[n-1])
 		n = n<<1 | b
 	}
 	return n - m

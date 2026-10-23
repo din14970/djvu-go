@@ -58,3 +58,7 @@ Library/
 tmp/
 temp/
 *.tmp
+
+# Local working files, never commit
+realdata/
+test.djvu

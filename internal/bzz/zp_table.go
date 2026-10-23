@@ -266,3 +266,15 @@ var zpTable = [256]struct {
 	{0x481a, 0x0000, 89, 143},
 	{0x481a, 0x0000, 230, 246},
 }
+
+// TableProb returns the probability estimate of adaptation state i.
+func TableProb(i int) uint32 { return zpTable[i].p }
+
+// TableThreshold returns the adaptation threshold of state i.
+func TableThreshold(i int) uint32 { return zpTable[i].m }
+
+// TableUp returns the next state after an MPS outcome for state i.
+func TableUp(i int) uint8 { return zpTable[i].up }
+
+// TableDown returns the next state after an LPS outcome for state i.
+func TableDown(i int) uint8 { return zpTable[i].dn }
