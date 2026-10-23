@@ -1,0 +1,60 @@
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# Go
+/go/
+/bin/
+*.exe
+*.test
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite-journal
+
+# Storage
+biblis-data/
+
+# Build
+build/
+dist/
+
+# Data directory - NEVER commit to git
+data/
+Library/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
