@@ -205,3 +205,10 @@ func (z *ZPDecoder) ffz(x uint32) int {
 	}
 	return z.ffzt[(x>>8)&0xff]
 }
+
+// IWDecodePass decodes one message bit with the IW44 variant of the
+// context-less decoder (ZPCodec::IWdecoder), used for coefficient signs
+// and mantissa adjustments in IW44 data.
+func (z *ZPDecoder) IWDecodePass() int {
+	return z.decodeSubSimple(0, 0x8000+((z.a+z.a+z.a)>>3))
+}
