@@ -109,15 +109,12 @@ func filterBH(p []int16, base, w, h, rowsize, scale int) {
 		if q < e {
 			// Special case: x=0.
 			a1, a0 = 0, 0
+			a2, a3 = 0, 0
 			if q+s < e {
 				a2 = int(p[q+s])
-			} else {
-				a2 = 0
 			}
 			if q+s3 < e {
 				a3 = int(p[q+s3])
-			} else {
-				a3 = 0
 			}
 			b2 = int(p[q]) - ((((a1 + a2) << 3) + (a1 + a2) - a0 - a3 + 16) >> 5)
 			b3 = b2
@@ -130,8 +127,6 @@ func filterBH(p []int16, base, w, h, rowsize, scale int) {
 			a2 = a3
 			if q+s3 < e {
 				a3 = int(p[q+s3])
-			} else {
-				a3 = 0
 			}
 			b3 = int(p[q]) - ((((a1 + a2) << 3) + (a1 + a2) - a0 - a3 + 16) >> 5)
 			p[q] = int16(b3)
@@ -144,8 +139,6 @@ func filterBH(p []int16, base, w, h, rowsize, scale int) {
 			a2 = a3
 			if q+s3 < e {
 				a3 = int(p[q+s3])
-			} else {
-				a3 = 0
 			}
 			b3 = int(p[q]) - ((((a1 + a2) << 3) + (a1 + a2) - a0 - a3 + 16) >> 5)
 			p[q] = int16(b3)

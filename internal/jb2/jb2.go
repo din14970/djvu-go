@@ -944,3 +944,32 @@ func (c *codec) codeImageRecord(im *Image, rectype int) (bool, error) {
 	}
 	return false, nil
 }
+
+// ShapeWidth returns the width of the shape bitmap in pixels, or 0
+// when the shape has no bitmap.
+func (s *Shape) ShapeWidth() int {
+	if s.Bits == nil {
+		return 0
+	}
+	return s.Bits.w
+}
+
+// ShapeHeight returns the height of the shape bitmap in pixels, or 0
+// when the shape has no bitmap.
+func (s *Shape) ShapeHeight() int {
+	if s.Bits == nil {
+		return 0
+	}
+	return s.Bits.h
+}
+
+// ShapeRow returns row y of the shape bitmap: sw bytes of 0 or 1,
+// ordered bottom to top like the blit coordinates. It returns nil
+// when the shape has no bitmap or the row is outside the shape; the
+// caller must treat missing rows as all zero.
+func (s *Shape) ShapeRow(y int) []byte {
+	if s.Bits == nil || y < 0 || y >= s.Bits.h {
+		return nil
+	}
+	return s.Bits.row(y)[s.Bits.border : s.Bits.border+s.Bits.w]
+}

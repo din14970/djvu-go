@@ -201,3 +201,38 @@ func TestGoldenColor(t *testing.T) {
 		}
 	}
 }
+
+// TestGoldenSmall renders the small.djvu fixture (100x75, a size that
+// is not a multiple of the 32 pixel block size) and compares against
+// ddjvu. This guards the border handling of the lifting filters.
+func TestGoldenSmall(t *testing.T) {
+	chunks := loadBG44(t, "testdata/small.djvu")
+	if len(chunks) != 3 {
+		t.Fatalf("expected 3 BG44 chunks, got %d", len(chunks))
+	}
+	img := NewColor()
+	for _, c := range chunks {
+		if _, err := img.DecodeChunk(c.Payload()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if img.Width() != 100 || img.Height() != 75 {
+		t.Fatalf("dimensions: got %dx%d want 100x75", img.Width(), img.Height())
+	}
+	out := img.RGBA(1)
+	w, h, gold := readPNM(t, "testdata/small_bg.pgm")
+	if w != out.Rect.Dx() || h != out.Rect.Dy() {
+		t.Fatalf("dimensions: got %dx%d want %dx%d", out.Rect.Dx(), out.Rect.Dy(), w, h)
+	}
+	for i := 0; i < w*h; i++ {
+		o := i * 4
+		for k := 0; k < 3; k++ {
+			if out.Pix[o+k] != gold[3*i+k] {
+				t.Fatalf("pixel (%d,%d): got %d,%d,%d want %d,%d,%d",
+					i%w, i/w,
+					out.Pix[o], out.Pix[o+1], out.Pix[o+2],
+					gold[3*i], gold[3*i+1], gold[3*i+2])
+			}
+		}
+	}
+}

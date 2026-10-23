@@ -1,6 +1,10 @@
 package iw44
 
-import "image"
+import (
+	"image"
+
+	"codeberg.org/din14970/djvu-go/internal/pixmap"
+)
 
 // Gray renders the image as a grayscale image at the given subsampling
 // factor (1, 2, 4, 8 or 16). It returns nil if no chunk has been
@@ -90,6 +94,62 @@ func (im *Image) RGBA(subsample int) *image.RGBA {
 			out.Pix[o+1] = clamp(tg)
 			out.Pix[o+2] = clamp(tb)
 			out.Pix[o+3] = 0xff
+		}
+	}
+	return out
+}
+
+// Pixmap renders the image as a bottom up RGB pixmap at the given
+// subsampling factor, the coordinate convention of the reference
+// library. It returns nil if no chunk has been decoded.
+func (im *Image) Pixmap(subsample int) *pixmap.Pixmap {
+	if im.w == 0 {
+		return nil
+	}
+	w := (im.w + subsample - 1) / subsample
+	h := (im.h + subsample - 1) / subsample
+	out := pixmap.New(w, h)
+	y := im.component(subsample, 0)
+	if im.cbb == nil || im.crb == nil || im.crcbDelay < 0 {
+		// Gray data. Inside a color container (pixmap), the reference
+		// renders gray with inverted polarity (IWPixmap's fallback);
+		// standalone gray images use the plain gray level.
+		for i := 0; i < h; i++ {
+			for j := 0; j < w; j++ {
+				var g uint8
+				if im.pixmap {
+					g = uint8(127 - int(y[i*w+j]))
+				} else {
+					g = uint8(int(y[i*w+j]) + 128)
+				}
+				out.Set(j, i, g, g, g)
+			}
+		}
+		return out
+	}
+	cb := im.cbb.component(subsample, im.crcbHalf)
+	cr := im.crb.component(subsample, im.crcbHalf)
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			// Pigeon transform (Transform::Decode::YCbCr_to_RGB).
+			yc := int(y[i*w+j])
+			b := int(cb[i*w+j])
+			r := int(cr[i*w+j])
+			t1 := b >> 2
+			t2 := r + (r >> 1)
+			t3 := yc + 128 - t1
+			tr := yc + 128 + t2
+			tg := t3 - (t2 >> 1)
+			tb := t3 + (b << 1)
+			clamp := func(x int) uint8 {
+				if x < 0 {
+					return 0
+				} else if x > 255 {
+					return 255
+				}
+				return uint8(x)
+			}
+			out.Set(j, i, clamp(tr), clamp(tg), clamp(tb))
 		}
 	}
 	return out
