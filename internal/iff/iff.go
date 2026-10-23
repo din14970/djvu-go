@@ -77,9 +77,9 @@ type Chunk struct {
 	// region the chunk list was parsed from.
 	Start int64
 
-	ra         io.ReaderAt
-	depth      int
-	composite  bool
+	ra        io.ReaderAt
+	depth     int
+	composite bool
 	// contentOff and contentEnd delimit the chunk content region: the
 	// payload for plain chunks, the nested chunk stream for composites.
 	contentOff int64
