@@ -10,24 +10,67 @@ layers: it counts and describes pages, extracts text, annotations and
 metadata, and renders pages to RGBA images with output byte-identical
 to the reference `ddjvu` tool.
 
-## Format support
+## Comparison with djvulibre
 
-| Feature | Status |
-|---|---|
-| IFF chunk structure (FORM/LIST/PROP/CAT) | decoded |
-| Bundled multipage documents (FORM:DJVM + DIRM) | decoded |
-| Indirect multipage documents | directory only (external files are listed, not loaded) |
-| Page INFO (size, DPI, gamma, orientation) | decoded |
-| JB2 bilevel decoding (Sjbz, Djbz, shared dictionaries) | decoded |
-| IW44 wavelet decoding (BG44, FG44) | decoded, byte-exact vs ddjvu |
-| FGbz palettes (per-object colors) | decoded |
-| MRC page compositing and Render | decoded, byte-exact vs ddjvu |
-| Hidden text (TXTz/TXTa), outline (NAVM), annotations (ANTa/ANTz) | decoded |
-| Subsampled rendering (factors 2..15) | decoded, byte-exact vs ddjvu |
-| Encoding / writing DjVu files | not implemented |
-| MMR (Smmr), JPEG (BGjp/FGjp) alternatives | not implemented |
-| Page rotation from INFO orientation flags | not implemented (pages render unrotated) |
-| Gamma correction other than identity | not implemented (colors match the file's design gamma) |
+djvulibre is the reference implementation and the feature superset.
+This library is a pure Go decoder whose output is verified byte-identical
+to djvulibre's `ddjvu` for everything it implements.
+
+### Feature comparison
+
+| | djvu-go | djvulibre |
+|---|---|---|
+| Language / dependencies | Pure Go, cgo-free, standard library only | C++, needs libjpeg |
+| IFF chunk structure | yes | yes |
+| DIRM directory (bundled + indirect) | yes (indirect: directory only) | yes (loads external files) |
+| Page INFO, annotations, metadata, hidden text, outline | yes | yes |
+| BZZ (de)compression | decode | encode + decode |
+| JB2 bilevel (Sjbz, Djbz, shared dictionaries) | decode | encode + decode |
+| IW44 wavelet (BG44, FG44) | decode, byte-exact vs ddjvu | encode + decode |
+| FGbz palettes | decode | encode + decode |
+| MRC compositing, subsampled rendering | yes, byte-exact vs ddjvu | yes |
+| MMR (Smmr), JPEG in DjVu (BGjp/FGjp) | no | yes |
+| TH44 thumbnails | listed, not decoded | decode |
+| Page rotation, non-identity gamma at render time | no | yes |
+| Encoding / writing DjVu files | no | yes (c44, cjb2, cpaldjvu, ...) |
+| Command line tools | examples only (webserver, test_read) | 20+ tools (ddjvu, djvused, djvumake, ...) |
+| C API / browser plugin | no | ddjvuapi, NSPlugin |
+| Runs untrusted input in-process | Go memory safety; all decoders fuzzed | C++ with raw pointers; known crash bugs |
+
+### Engineering comparison
+
+djvulibre ships no test suite: its repository has no test directory and
+no `make check` target; validation consists of debug assertions that
+are compiled out of release builds. Its tools' output is the de facto
+conformance reference. This library therefore verifies against that
+reference directly:
+
+| | djvu-go | djvulibre |
+|---|---|---|
+| Test suite | unit + golden tests for every decoder; renderings compared byte for byte with ddjvu (gray and color IW44, compound palette, three-layer, bitonal pages, subsampling factors 1-12, page masks vs `ddjvu -mode=black`) | none (debug-only assertions) |
+| Fuzzing | built-in `go test -fuzz` targets for every decoder plus an end-to-end pipeline target; fuzz findings fixed, not filtered; corpus entries committed as regression fixtures | none in-tree |
+| Real-world corpus | renders every page of a real-world corpus when present; fails only on errors or panics | n/a |
+| Lint / CI | golangci-lint (errcheck, govet, staticcheck, revive, gosec) clean; CI builds and tests Linux + macOS on Go 1.22/1.23 with a 60s fuzz job per target | no CI tests |
+
+### Security posture
+
+The two security issues open against djvulibre at the time of writing
+(upstream #1 and #2, both in the IW44 decoder) do not affect this
+library:
+
+- **Integer overflow and null write in the IW44 Map constructor** (CWE-190,
+  CWE-476): a stream declaring 65535x65535 overflows the 32-bit block
+  count. Here dimensions are validated before any allocation and the
+  block count is computed in 64-bit integers; the equivalent proof of
+  concept is rejected with an error (`testdata/security/`).
+- **Division by zero in IW44 reconstruction** (CWE-369): a stream
+  declaring a 0x0 image. Rejected at the same guard.
+
+Both proof of concept files are committed as regression fixtures in
+`testdata/security/` and replayed by `TestSecurityPoCs`. For
+reference, an unpatched djvulibre (< 3.5.30) crashes on both; the
+guards djvulibre 3.5.30 added mirror the ones this library has had
+since its first IW44 commit.
 
 ## Installation
 
