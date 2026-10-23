@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 
 	"codeberg.org/din14970/djvu-go/iff"
 	"codeberg.org/din14970/djvu-go/internal/bzz"
@@ -158,6 +159,10 @@ type Document struct {
 	comps  map[string]*component
 	shared *component
 	navm   *iff.Chunk
+
+	// Decoded page layers, filled on demand by Render.
+	renderMu    sync.Mutex
+	renderCache map[int]*pageLayers
 }
 
 // Open parses a DjVu document from r, which may be a single-page image

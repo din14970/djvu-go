@@ -8,6 +8,8 @@
 package render
 
 import (
+	"image"
+
 	"codeberg.org/din14970/djvu-go/internal/jb2"
 	"codeberg.org/din14970/djvu-go/internal/palette"
 	"codeberg.org/din14970/djvu-go/internal/pixmap"
@@ -290,4 +292,54 @@ func stencilPixmap(l *Layers, pm *pixmap.Pixmap, subsample int, rect pixmap.Rect
 	nfg := pixmap.New(desw, desh)
 	ps.Scale(pixmap.Rect{XMax: fg.W, YMax: fg.H}, fg, pixmap.Rect{XMax: desw, YMax: desh}, nfg)
 	pm.Stencil(bm, nfg, supersample, rect)
+}
+
+// ToRGBA converts a bottom up pixmap into a top down RGBA image, the
+// orientation convention of the image package.
+func ToRGBA(pm *pixmap.Pixmap) *image.RGBA {
+	out := image.NewRGBA(image.Rect(0, 0, pm.W, pm.H))
+	for y := 0; y < pm.H; y++ {
+		src := (pm.H - 1 - y) * pm.W
+		for x := 0; x < pm.W; x++ {
+			o := y*out.Stride + x*4
+			out.Pix[o] = pm.Pix[(src+x)*3]
+			out.Pix[o+1] = pm.Pix[(src+x)*3+1]
+			out.Pix[o+2] = pm.Pix[(src+x)*3+2]
+			out.Pix[o+3] = 0xff
+		}
+	}
+	return out
+}
+
+// Bitonal renders a page that has a mask but neither palette nor color
+// foreground: black content on white, anti-aliased through the alpha
+// map. The conversion follows the bitmap branch of the reference's
+// pixel conversion (ddjvu's fmt_convert for gray maps):
+// level = white - (alpha*white + (grays-1)/2) / (grays-1).
+func Bitonal(l *Layers, subsample int) *pixmap.Pixmap {
+	if l.Mask == nil {
+		return nil
+	}
+	rect := rectOf(l.Width, l.Height, subsample)
+	pm := pixmap.New(rect.Width(), rect.Height())
+	pm.Fill(255, 255, 255)
+	bm := pixmap.NewAlpha(rect.Width(), rect.Height(), subsample)
+	for _, blitno := range visible(l, rect, subsample) {
+		blitAlpha(bm, l.Mask, blitno, 0, 0)
+	}
+	maxgray := bm.Grays - 1
+	if maxgray < 1 {
+		return pm
+	}
+	for i, c := range bm.C {
+		if c > 0 {
+			cc := int(c)
+			if cc > maxgray {
+				cc = maxgray
+			}
+			g := byte(255 - (cc*255+(maxgray-1)/2)/maxgray)
+			pm.Pix[3*i], pm.Pix[3*i+1], pm.Pix[3*i+2] = g, g, g
+		}
+	}
+	return pm
 }
