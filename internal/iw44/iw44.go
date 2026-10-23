@@ -202,6 +202,9 @@ func (im *Image) DecodeChunk(r io.Reader) (int, error) {
 	flag := 1
 	for flag != 0 && im.cslice < nslices {
 		flag = im.ycodec.codeSlice(zp)
+		if err := zp.Err(); err != nil {
+			return im.cslice, fmt.Errorf("iw44: decoding slice %d: %w", im.cslice, err)
+		}
 		if im.cbcodec != nil && im.crcodec != nil && im.crcbDelay <= im.cslice {
 			f := im.cbcodec.codeSlice(zp)
 			if f != 0 {
@@ -210,6 +213,9 @@ func (im *Image) DecodeChunk(r io.Reader) (int, error) {
 			f = im.crcodec.codeSlice(zp)
 			if f != 0 {
 				flag = 1
+			}
+			if err := zp.Err(); err != nil {
+				return im.cslice, fmt.Errorf("iw44: decoding chroma of slice %d: %w", im.cslice, err)
 			}
 		}
 		im.cslice++

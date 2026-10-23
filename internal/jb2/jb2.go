@@ -682,8 +682,19 @@ func (c *codec) codeDict(d *Dict) error {
 	return nil
 }
 
-// codeDictRecord decodes one dictionary record.
+// codeDictRecord decodes one dictionary record. Records other than
+// the start of data record and the two header records may only appear
+// after the start of data record; earlier ones would be wiped by the
+// library reinitialization (the reference behaves the same way, by
+// accident of its array resizing), so they are rejected instead.
 func (c *codec) codeDictRecord(d *Dict, rectype int) (bool, error) {
+	if !c.gotStart &&
+		rectype != recStartOfData &&
+		rectype != recRequiredDictOrReset &&
+		rectype != recPreservedComment &&
+		rectype != recEndOfData {
+		return false, fmt.Errorf("jb2: record type %d before start of data record", rectype)
+	}
 	switch rectype {
 	case recStartOfData:
 		if c.gotStart {
@@ -804,6 +815,13 @@ func (c *codec) codeImageRecord(im *Image, rectype int) (bool, error) {
 	inLibrary := false
 	blitsPage := false
 
+	if !c.gotStart &&
+		rectype != recStartOfData &&
+		rectype != recRequiredDictOrReset &&
+		rectype != recPreservedComment &&
+		rectype != recEndOfData {
+		return false, fmt.Errorf("jb2: record type %d before start of data record", rectype)
+	}
 	switch rectype {
 	case recStartOfData:
 		if c.gotStart {
