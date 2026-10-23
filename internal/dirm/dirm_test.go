@@ -221,7 +221,7 @@ func TestParseShortStringTable(t *testing.T) {
 	// (A count only slightly too large can still decode "successfully"
 	// by consuming unrelated strings, exactly like the reference
 	// implementation; this count exhausts the table.)
-	hdr := []byte{0x01, 0x00, 0x06} // claims 6 files
+	hdr := []byte{0x01, 0x00, 0x06}                           // claims 6 files
 	payload := append(hdr, syntheticTail(t, "tail_v1.bz")...) // has 2
 	if _, err := Parse(bytes.NewReader(payload)); err == nil {
 		t.Error("expected error for missing strings")

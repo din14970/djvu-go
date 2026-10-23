@@ -70,9 +70,9 @@ const (
 
 // Flag bits of the obsolete version 0 flag byte.
 const (
-	flag0IsPage    = 1
-	flag0HasName   = 2
-	flag0HasTitle  = 4
+	flag0IsPage   = 1
+	flag0HasName  = 2
+	flag0HasTitle = 4
 )
 
 // File describes one component file of a multipage document.
