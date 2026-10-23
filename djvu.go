@@ -17,9 +17,9 @@ import (
 	"io"
 	"strings"
 
+	"codeberg.org/din14970/djvu-go/iff"
 	"codeberg.org/din14970/djvu-go/internal/bzz"
 	"codeberg.org/din14970/djvu-go/internal/dirm"
-	"codeberg.org/din14970/djvu-go/internal/iff"
 )
 
 // DocumentKind classifies the storage model of a DjVu document.
@@ -151,14 +151,13 @@ type component struct {
 // Document is a parsed DjVu document. Its methods are safe for
 // concurrent use by multiple goroutines; all parsing happens in [Open].
 type Document struct {
-	kind    DocumentKind
-	single  *page
-	dir     *dirm.Directory
-	pages   []*page
-	comps   map[string]*component
-	shared  *component
-	navm    *iff.Chunk
-	rawSize int64
+	kind   DocumentKind
+	single *page
+	dir    *dirm.Directory
+	pages  []*page
+	comps  map[string]*component
+	shared *component
+	navm   *iff.Chunk
 }
 
 // Open parses a DjVu document from r, which may be a single-page image

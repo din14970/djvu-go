@@ -1,5 +1,8 @@
 // Package iff implements a reader for the EA IFF 85 chunk structure that
-// forms the backbone of the DjVu file format.
+// forms the backbone of the DjVu file format. It is the low-level API of
+// this module: the djvu package builds document parsing on top of it,
+// and it can be used directly by tools that need to inspect or walk the
+// chunk structure of IFF files.
 //
 // An IFF file is a sequence of chunks. Each chunk starts with a four byte
 // chunk identifier followed by a 32 bit big endian length. Chunks whose
