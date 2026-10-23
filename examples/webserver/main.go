@@ -56,6 +56,7 @@ func main() {
 
 	full := regexp.MustCompile(`^/page/([0-9]+)\.png$`)
 	sub := regexp.MustCompile(`^/page/([0-9]+)/sub/([0-9]+)\.png$`)
+	text := regexp.MustCompile(`^/page/([0-9]+)/text\.txt$`)
 	render := func(w http.ResponseWriter, page, subsample int) {
 		if page < 0 || page >= n {
 			http.NotFound(w, nil)
@@ -76,6 +77,23 @@ func main() {
 			page, _ := strconv.Atoi(m[1])
 			sub, _ := strconv.Atoi(m[2])
 			render(w, page, sub)
+			return
+		}
+		if m := text.FindStringSubmatch(r.URL.Path); m != nil {
+			page, _ := strconv.Atoi(m[1])
+			if page < 0 || page >= n {
+				http.NotFound(w, nil)
+				return
+			}
+			t, err := doc.PageText(page)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			if _, err := w.Write([]byte(t)); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 		http.NotFound(w, nil)
