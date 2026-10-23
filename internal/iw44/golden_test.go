@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 // loadBG44 reads the BG44 chunks of the first FORM:DJVU in a single

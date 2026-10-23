@@ -21,7 +21,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"codeberg.org/din14970/djvu-go"
+	"github.com/din14970/djvu-go"
 )
 
 func main() {

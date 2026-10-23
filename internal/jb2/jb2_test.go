@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/internal/bitmap"
+	"github.com/din14970/djvu-go/internal/bitmap"
 )
 
 // randomShape creates a random blob shape.

@@ -1,7 +1,7 @@
 package iw44
 
 import (
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // Coefficient states (IW44Image::Codec).

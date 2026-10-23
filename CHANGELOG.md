@@ -2,7 +2,8 @@
 
 ## v0.2.0 (2026-10-23)
 
-Page decoding and rendering. The library now produces images.
+Page decoding and rendering. The library now produces images. Module
+path: github.com/din14970/djvu-go.
 
 - `Document.Render(page, RenderOptions{Subsample})` and
   `Document.RenderPNG` composite a page into a top-down RGBA image.

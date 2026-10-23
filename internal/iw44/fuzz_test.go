@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 // seedBG44 collects the BG44 chunk payloads of a fixture document.

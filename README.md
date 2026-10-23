@@ -1,6 +1,18 @@
 # djvu-go
 
-[![Go Reference](https://pkg.go.dev/badge/codeberg.org/din14970/djvu-go.svg)](https://pkg.go.dev/codeberg.org/din14970/djvu-go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/din14970/djvu-go.svg)](https://pkg.go.dev/github.com/din14970/djvu-go)
+
+> [!WARNING]
+> **AI-generated code.** Most of this library was written by an AI
+> coding agent (Mistral Vibe, hosted by Mistral, model GLM-5.3), from
+> the DjVu format specification and the djvulibre reference sources.
+> It carries no human review yet. Review the code and run the test
+> suite yourself before making it a dependency of your project. The
+> mitigations that exist: every decoder is verified byte-for-byte
+> against djvulibre's `ddjvu` output, fuzz targets cover every
+> decoder plus the whole pipeline, and known upstream security issues
+> are replayed as regression fixtures — see
+> [Comparison with djvulibre](#comparison-with-djvulibre) below.
 
 A pure Go library for reading and rendering DjVu documents. No cgo, no
 external dependencies, no shelling out to djvulibre.
@@ -69,13 +81,21 @@ library:
 Both proof of concept files are committed as regression fixtures in
 `testdata/security/` and replayed by `TestSecurityPoCs`. For
 reference, an unpatched djvulibre (< 3.5.30) crashes on both; the
-guards djvulibre 3.5.30 added mirror the ones this library has had
-since its first IW44 commit.
+guards djvulibre added in the 3.5.30 tree mirror the ones this
+library has had since its first IW44 commit.
+
+This analysis is verified against the live upstream source of truth,
+the [SourceForge djvulibre-git repository](https://sourceforge.net/p/djvu/djvulibre-git/ci/master/tree/)
+(the GitHub mirror is stale); as of the 3.5.30 tag the decode paths
+ported here (IW44, JB2, ZP, BZZ, palette, compositing) are identical
+in both, and the only newer decode-relevant change (TXT chunk zone
+validation) does not apply because this library does not decode the
+positional zone structure.
 
 ## Installation
 
 ```
-go get codeberg.org/din14970/djvu-go
+go get github.com/din14970/djvu-go
 ```
 
 Requires Go 1.22 or newer.
@@ -93,7 +113,7 @@ import (
 	"fmt"
 	"os"
 
-	"codeberg.org/din14970/djvu-go"
+	"github.com/din14970/djvu-go"
 )
 
 func main() {
@@ -171,7 +191,7 @@ unavailable for indirect documents.
 ### Low-level chunk access
 
 The IFF chunk layer is exported as the
-[`iff`](https://pkg.go.dev/codeberg.org/din14970/djvu-go/iff) package:
+[`iff`](https://pkg.go.dev/github.com/din14970/djvu-go/iff) package:
 
 ```go
 chunks, err := iff.ParseChunks(r) // top-level chunk list

@@ -21,8 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"codeberg.org/din14970/djvu-go"
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go"
+	"github.com/din14970/djvu-go/iff"
 )
 
 func main() {

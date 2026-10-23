@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/internal/zptest"
+	"github.com/din14970/djvu-go/internal/zptest"
 )
 
 // encCodec is the encoder twin of codec.

@@ -18,9 +18,9 @@ import (
 	"strings"
 	"sync"
 
-	"codeberg.org/din14970/djvu-go/iff"
-	"codeberg.org/din14970/djvu-go/internal/bzz"
-	"codeberg.org/din14970/djvu-go/internal/dirm"
+	"github.com/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/dirm"
 )
 
 // DocumentKind classifies the storage model of a DjVu document.

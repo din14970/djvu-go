@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 // walkForms visits all chunks reachable below cs, calling fn on each.

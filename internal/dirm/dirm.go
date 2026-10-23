@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"io"
 
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // Version is the DIRM format version produced and understood here.

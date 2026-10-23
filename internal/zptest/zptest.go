@@ -8,7 +8,7 @@ package zptest
 import (
 	"io"
 
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // Encoder implements the ZP arithmetic encoder.

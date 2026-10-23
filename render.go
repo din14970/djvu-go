@@ -6,10 +6,10 @@ import (
 	"image/png"
 	"io"
 
-	"codeberg.org/din14970/djvu-go/internal/iw44"
-	"codeberg.org/din14970/djvu-go/internal/jb2"
-	"codeberg.org/din14970/djvu-go/internal/palette"
-	"codeberg.org/din14970/djvu-go/internal/render"
+	"github.com/din14970/djvu-go/internal/iw44"
+	"github.com/din14970/djvu-go/internal/jb2"
+	"github.com/din14970/djvu-go/internal/palette"
+	"github.com/din14970/djvu-go/internal/render"
 )
 
 // maxDimension is the largest page dimension the renderer accepts.

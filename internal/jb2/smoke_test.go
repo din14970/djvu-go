@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 func findChunks(chunks []*iff.Chunk, id string, out *[]*iff.Chunk) {

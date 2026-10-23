@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"io"
 
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // Codec version accepted (IWCODEC_MAJOR/MINOR).

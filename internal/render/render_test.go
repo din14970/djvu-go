@@ -7,11 +7,11 @@ import (
 	"os"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
-	"codeberg.org/din14970/djvu-go/internal/iw44"
-	"codeberg.org/din14970/djvu-go/internal/jb2"
-	"codeberg.org/din14970/djvu-go/internal/palette"
-	"codeberg.org/din14970/djvu-go/internal/pixmap"
+	"github.com/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/internal/iw44"
+	"github.com/din14970/djvu-go/internal/jb2"
+	"github.com/din14970/djvu-go/internal/palette"
+	"github.com/din14970/djvu-go/internal/pixmap"
 )
 
 // readPNM parses a binary P5 or P6 file and returns its dimensions

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 // seedFGbz collects the FGbz chunk payloads of a fixture document.

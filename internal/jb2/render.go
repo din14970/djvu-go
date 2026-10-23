@@ -1,6 +1,6 @@
 package jb2
 
-import "codeberg.org/din14970/djvu-go/internal/bitmap"
+import "github.com/din14970/djvu-go/internal/bitmap"
 
 // PageBitmap composites every blit of the image into a page mask of
 // Width x Height pixels: bit set means ink. Blits referencing shapes

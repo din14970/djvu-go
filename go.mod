@@ -1,3 +1,3 @@
-module codeberg.org/din14970/djvu-go
+module github.com/din14970/djvu-go
 
 go 1.22

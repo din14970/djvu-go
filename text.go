@@ -3,7 +3,7 @@ package djvu
 import (
 	"fmt"
 
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // PageText returns the hidden text layer of the given page: the UTF-8

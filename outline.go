@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"codeberg.org/din14970/djvu-go/internal/bzz"
+	"github.com/din14970/djvu-go/internal/bzz"
 )
 
 // Bookmark is one entry of the document outline (the navigation

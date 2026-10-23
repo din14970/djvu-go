@@ -3,7 +3,7 @@ package iw44
 import (
 	"image"
 
-	"codeberg.org/din14970/djvu-go/internal/pixmap"
+	"github.com/din14970/djvu-go/internal/pixmap"
 )
 
 // Gray renders the image as a grayscale image at the given subsampling

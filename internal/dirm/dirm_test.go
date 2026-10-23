@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"codeberg.org/din14970/djvu-go/iff"
+	"github.com/din14970/djvu-go/iff"
 )
 
 // dirmFromFixture opens a DjVu fixture, walks to its DIRM chunk and parses
