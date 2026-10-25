@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/GPixmap.cpp and libdjvu/GBitmap.cpp (alpha map and compositing).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package pixmap implements the color compositing primitives of the
 // DjVu reference library: an 8 bit RGB pixmap with row origin at the
 // bottom (like GPixmap), a byte-count alpha map (like a GBitmap with

@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/BSByteStream.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package bzz implements the decoding side of the BZZ general purpose
 // compressor used throughout the DjVu format (DIRM directories, ANTz
 // annotations, TXTz hidden text, NAVM outlines, FGbz palettes).

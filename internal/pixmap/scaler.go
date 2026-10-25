@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/GScaler.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 package pixmap
 
 // fracBits is the fixed point precision of the scaler coordinates.

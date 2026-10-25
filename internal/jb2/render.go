@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/JB2Image.cpp (blit compositing).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 package jb2
 
 import "github.com/din14970/djvu-go/internal/bitmap"

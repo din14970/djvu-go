@@ -2,7 +2,9 @@
 
 ## v0.2.0 (2026-10-23)
 
-Page decoding and rendering. The library now produces images. Module
+Page decoding and rendering. The library now produces images. The
+library is licensed GPL-2.0-or-later as a derivative work of djvulibre
+(the decoders are Go ports of its sources); see LICENSE. Module
 path: github.com/din14970/djvu-go.
 
 - `Document.Render(page, RenderOptions{Subsample})` and

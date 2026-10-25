@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/IW44Image.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package iw44 implements the decoder for IW44 wavelet coded images:
 // the BG44 (background), FG44 (foreground color) and TH44 (thumbnail)
 // chunks of DjVu files, as well as the obsolete PM44/BM44 image files.

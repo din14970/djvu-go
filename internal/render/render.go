@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/DjVuImage.cpp (get_pixmap and stencil).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package render composites the decoded layers of a DjVu page into an
 // image, following the MRC model of the reference implementation
 // (DjVuImage::get_pixmap and DjVuImage::stencil): a wavelet coded

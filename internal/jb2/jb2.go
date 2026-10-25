@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/JB2Image.cpp (JB2 record coding).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package jb2 implements the decoder for JB2 coded bilevel data: the
 // Sjbz chunks of DjVu pages (foreground masks) and the Djbz chunks of
 // shared shape dictionaries.

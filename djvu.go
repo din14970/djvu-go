@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/DjVuDocument.cpp and libdjvu/DjVuFile.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package djvu is a pure Go reader for the DjVu file format. It parses
 // single-page and multipage (bundled and indirect) documents and gives
 // access to their structure: pages, dimensions and resolution (INFO),

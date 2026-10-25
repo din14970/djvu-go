@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/ZPCodec.cpp (encode side, test support).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package zptest provides a reference-compatible ZP encoder for tests.
 // It is a port of the encoding half of ZPCodec.cpp (ZPCODER variant,
 // djvucompat mode) and exists so that decoder tests can produce streams

@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/GBitmap.cpp (packed bitmap operations).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package bitmap provides a packed 1 bit-per-pixel bitmap with clipped
 // blitting, the working representation for decoded JB2 page masks and
 // for MRC compositing.

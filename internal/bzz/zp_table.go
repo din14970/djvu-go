@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/ZPCodec.cpp (adaptation table).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Code generated from the ZP adaptation table in DjVuLibre's ZPCodec.cpp
 // (ZPCODER variant, used with the djvucompat flag). DO NOT EDIT.
 

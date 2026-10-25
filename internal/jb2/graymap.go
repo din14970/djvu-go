@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/JB2Image.cpp and libdjvu/GBitmap.cpp (bordered bitmaps).
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 package jb2
 
 // grayMap is a small grayscale bitmap used to hold JB2 shapes while

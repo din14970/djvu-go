@@ -11,8 +11,10 @@
 > mitigations that exist: every decoder is verified byte-for-byte
 > against djvulibre's `ddjvu` output, fuzz targets cover every
 > decoder plus the whole pipeline, and known upstream security issues
-> are replayed as regression fixtures — see
-> [Comparison with djvulibre](#comparison-with-djvulibre) below.
+> are replayed as regression fixtures. Note the license: this is a
+> **GPL-2.0-or-later** derivative work of djvulibre, not permissively
+> licensed. See [License](#license) and the
+> [comparison with djvulibre](#comparison-with-djvulibre) below.
 
 A pure Go library for reading and rendering DjVu documents. No cgo, no
 external dependencies, no shelling out to djvulibre.
@@ -238,4 +240,8 @@ Golden fixtures are generated with the djvulibre tools;
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+GPL-2.0-or-later, see [LICENSE](LICENSE). The decoders are
+Go ports of the djvulibre reference implementation, which is itself
+GPL-2.0-or-later; a translation of a GPL work is a derivative work,
+so this library inherits the license. Each source file records the
+upstream file it was ported from.

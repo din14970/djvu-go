@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/IFFByteStream.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package iff implements a reader for the EA IFF 85 chunk structure that
 // forms the backbone of the DjVu file format. It is the low-level API of
 // this module: the djvu package builds document parsing on top of it,

@@ -1,3 +1,8 @@
+// Go port of djvulibre's libdjvu/DjVuPalette.cpp.
+// Upstream copyright (c) 2002 Leon Bottou and Yann Le Cun; derived
+// from the DjVu Reference Library (c) 1999-2001 LizardTech, Inc. This
+// derivative work is licensed GPL-2.0-or-later; see the LICENSE file.
+
 // Package palette decodes FGbz chunks: the color palette (and optional
 // per blit color indices) of compound DjVu documents, following
 // DjVuPalette::decode of the reference implementation.
